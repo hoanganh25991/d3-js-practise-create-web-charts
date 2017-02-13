@@ -15,6 +15,7 @@
 	<li></li>
 	<li></li>
 </ul>
+<div id='circle'></div>
 <script src='js/d3.v3.min.js'></script>
 <script type="text/javascript">
 class MyD3 {
@@ -35,6 +36,16 @@ class MyD3 {
 		let li         = ul.selectAll('li').data(data);
 		let missing_li = li.enter().append('li').attr('class', 'missing').text(function(d){return d;});
 		let exist_li   = li.text(function(d){return 'exist,  ' + d; });
+	}
+
+	circle(){
+		let svg = d3.select('#circle').append('svg').attr('width', 200).attr('height', 200);
+		svg.append('circle').style('stroke', 'black').style('fill', 'purple')
+			.attr('r',  40)
+			.attr('cx', 50)
+			.attr('cy', 50);
+		//cx, cy determine WHERE is the center=point
+		//DONE ^^
 	}
 }
 	

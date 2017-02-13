@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<style>
+	.missing{
+		background: gray;
+	}	
+</style>
+</head>
+<body>
+<p>this will be change by d3</p>
+<p>this will be change by d3</p>
+<ul id='list-fruit'>
+	<li></li>
+	<li></li>
+</ul>
+<script src='js/d3.v3.min.js'></script>
+<script type="text/javascript">
+class MyD3 {
+	constructor(d3){
+		this.d3 = d3;
+	}
+
+	run(){
+		let d3 = this.d3;
+		let p_arr = d3.selectAll('p');
+		p_arr.text('what the heck');
+	}
+
+	run_data(){
+		let ul = d3.select('#list-fruit');
+		let data = ['apple', 'pie', 'orange', 'banana', 'tomato'];
+
+		let li         = ul.selectAll('li').data(data);
+		let missing_li = li.enter().append('li').attr('class', 'missing').text(function(d){return d;});
+		let exist_li   = li.text(function(d){return 'exist,  ' + d; });
+	}
+}
+	
+let my_d3 = new MyD3(d3);
+</script>
+</body>
+</html>

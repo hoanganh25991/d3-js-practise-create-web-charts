@@ -26,117 +26,348 @@ text {
 </head>
 <body>
 <script>
-var data = [100,110,140,130,80,75,120,130,100];
-w = 400;
-h = 300;
-margin_x = 32;
-margin_y = 20;
+class LineChart{
+    constructor(data, elementId, config = {w: 400, h: 300, margin_x: 32, margin_y: 20}){
+        this.data = data;
+        this.elementId = elementId;
+        this.config = config;
+        this.init();
+    }
 
-y = d3.scale.linear().domain([0, d3.max(data)]).range([0 + margin_y, h - margin_y]);
-x = d3.scale.linear().domain([0, data.length]).range([0 + margin_x, w - margin_x]);
+    init(){
+        let data = this.data;
+        let margin_y = this.config.margin_y;
+        let margin_x = this.config.margin_x;
+        let w = this.config.w;
+        let h = this.config.h;
+        let y = d3.scale.linear().domain([0, d3.max(data)]).range([0 + margin_y, h - margin_y]);
+        let x = d3.scale.linear().domain([0, data.length]).range([0 + margin_x, w - margin_x]);
+        this.x = x;
+        this.y = y;
+    }
 
-var svg = d3.select("body")
-    .append("svg:svg")
-    .attr("width", w)
-    .attr("height", h);
- 
-var g = svg.append("svg:g")
-    .attr("transform", "translate(0," + h + ")");
+    svg(){
+        let e = this.elementId;
+        let w = this.config.w;
+        let h = this.config.h;
+        var svg = d3.select(e)
+                    .append("svg:svg")
+                    .attr("width", w)
+                    .attr("height", h);
 
-var line = d3.svg.line()
-    .x(function(d,i) { return x(i); })
-    .y(function(d) { return -y(d); })
+        this.svg = svg;
+    }
 
-// draw the x axis
-g.append("svg:line")
-    .attr("x1", x(0))
-    .attr("y1", -y(0))
-    .attr("x2", x(w))
-    .attr("y2", -y(0))
- 
-// draw the y axis 
-g.append("svg:line")
-    .attr("x1", x(0))
-    .attr("y1", -y(0))
-    .attr("x2", x(0))
-    .attr("y2", -y(d3.max(data))-10);
+    g(){
+        let svg = this.svg;
+        let h = this.config.h
+        let g = svg.append("svg:g")
+                .attr("transform", "translate(0," + h + ")");
 
-//draw the xLabels   
-g.selectAll(".xLabel")
-    .data(x.ticks(5))
-    .enter().append("svg:text")
-    .attr("class", "xLabel")
-    .text(String)
-    .attr("x", function(d) { return x(d) })
-    .attr("y", 0)
-    .attr("text-anchor", "middle");
- 
-// draw the yLabels 
-g.selectAll(".yLabel")
-    .data(y.ticks(5))
-    .enter().append("svg:text")
-    .attr("class", "yLabel")
-    .text(String)
-    .attr("x", 25)
-    .attr("y", function(d) { return -y(d) })
-    .attr("text-anchor", "end");
+        this.g = g;
+    }
 
-//draw the x ticks    
-g.selectAll(".xTicks")
-    .data(x.ticks(5))
-    .enter().append("svg:line")
-    .attr("class", "xTicks")
-    .attr("x1", function(d) { return x(d); })
-    .attr("y1", -y(0))
-    .attr("x2", function(d) { return x(d); })
-    .attr("y2", -y(0)-5);
+    line(){
+        let x = this.x;
+        let y = this.y;
+        let line = d3.svg.line()
+                        .x(function(d,i) { return x(i); })
+                        .y(function(d) { return -y(d); });
+        this.line = line;
+    }
+
+    draw_x_axis(){
+        // draw the x axis
+        let g = this.g;
+        let w = this.config.w;
+        let x = this.x;
+        let y = this.y;
+        g.append("svg:line")
+            .attr("x1", x(0))
+            .attr("y1", -y(0))
+            .attr("x2", x(w))
+            .attr("y2", -y(0))
+    }
+
+    draw_y_axis(){
+        // draw the y axis 
+        let g = this.g;
+        let data = this.data;
+        let x = this.x;
+        let y = this.y;
+        g.append("svg:line")
+            .attr("x1", x(0))
+            .attr("y1", -y(0))
+            .attr("x2", x(0))
+            .attr("y2", -y(d3.max(data))-10);
+    }  
+
+    draw_x_label(){
+        let g = this.g;
+        let x = this.x;
+        //draw the xLabels   
+        g.selectAll(".xLabel")
+            .data(x.ticks(5))
+            .enter().append("svg:text")
+            .attr("class", "xLabel")
+            .text(String)
+            .attr("x", function(d) { return x(d) })
+            .attr("y", 0)
+            .attr("text-anchor", "middle");
+    }
+
+    draw_y_label(){
+        let y = this.y;
+        let g = this.g;
+        // draw the yLabels 
+        g.selectAll(".yLabel")
+            .data(y.ticks(5))
+            .enter().append("svg:text")
+            .attr("class", "yLabel")
+            .text(String)
+            .attr("x", 25)
+            .attr("y", function(d) { return -y(d) })
+            .attr("text-anchor", "end");
+    }
+
+    draw_x_ticks(){
+        let x = this.x;
+        let y = this.y;
+        let g = this.g;
+        //draw the x ticks    
+        g.selectAll(".xTicks")
+            .data(x.ticks(5))
+            .enter().append("svg:line")
+            .attr("class", "xTicks")
+            .attr("x1", function(d) { return x(d); })
+            .attr("y1", -y(0))
+            .attr("x2", function(d) { return x(d); })
+            .attr("y2", -y(0)-5);
+    }
+
+    draw_y_ticks(){
+        let g = this.g;
+        let y = this.y;
+        let x = this.x;
+         // draw the y ticks 
+        g.selectAll(".yTicks")
+            .data(y.ticks(5))
+            .enter().append("svg:line")
+            .attr("class", "yTicks")
+            .attr("y1", function(d) { return -1 * y(d); })
+            .attr("x1", x(0)+5)
+            .attr("y2", function(d) { return -1 * y(d); })
+            .attr("x2", x(0));
+    }
+
+    draw_x_grids(){
+        let g = this.g;
+        let x = this.x;
+        let y = this.y;
+        let data = this.data;
+        //draw the x grid   
+        g.selectAll(".xGrids")
+            .data(x.ticks(5))
+            .enter().append("svg:line")
+            .attr("class", "xGrids")
+            .attr("x1", function(d) { return x(d); })
+            .attr("y1", -y(0))
+            .attr("x2", function(d) { return x(d); })
+            .attr("y2", -y(d3.max(data))-10);
+    }
+
+    draw_y_grids(){
+        let g = this.g;
+        let x = this.x;
+        let y = this.y;
+        let data = this.data;
+        let w = this.config.w;
+        // draw the y grid 
+        g.selectAll(".yGrids")
+            .data(y.ticks(5))
+            .enter().append("svg:line")
+            .attr("class", "yGrids")
+            .attr("y1", function(d) { return -1 * y(d); })
+            .attr("x1", x(w))
+            .attr("y2", function(d) { return -y(d); })
+            .attr("x2", x(0));
+    }
+
+    draw_x_data(){
+        let g = this.g;
+        let x = this.x;
+        let y = this.y;
+        let w = this.config.w;
+        // // draw the x axis
+        g.append("svg:line")
+            .attr("x1", x(0))
+            .attr("y1", -y(0))
+            .attr("x2", x(w))
+            .attr("y2", -y(0));
+    }
+         
+    draw_y_data(){
+        let g = this.g;
+        let x = this.x;
+        let y = this.y;
+        let data = this.data;
+        // draw the y axis 
+        g.append("svg:line")
+            .attr("x1", x(0))
+            .attr("y1", -y(0))
+            .attr("x2", x(0))
+            .attr("y2", -y(d3.max(data))+10);
+    }
+    
+    draw_line_data(){
+        let g = this.g;
+        let data = this.data;
+        let line = this.line;
+        g.append("svg:path").attr("d", line(data));
+    }
+
+    // draw the line of data points
+
+
+    run(){
+        let order = [
+            'svg',
+            'g',
+            'line',
+            'draw_x_axis',
+            'draw_y_axis',
+            'draw_x_label',
+            'draw_y_label',
+            'draw_x_ticks',
+            'draw_y_ticks',
+            'draw_x_grids',
+            'draw_y_grids',
+            'draw_line_data'
+
+        ];
+        let c = this;
+
+        order.forEach(method => {
+            c[method]();
+        });
+    }
+}
+
+function draw(){
+    var data = [100,110,140,130,80,75,120,130,100];
+    w = 400;
+    h = 300;
+    margin_x = 32;
+    margin_y = 20;
+
+    y = d3.scale.linear().domain([0, d3.max(data)]).range([0 + margin_y, h - margin_y]);
+    x = d3.scale.linear().domain([0, data.length]).range([0 + margin_x, w - margin_x]);
+
+    var svg = d3.select("body")
+        .append("svg:svg")
+        .attr("width", w)
+        .attr("height", h);
      
-// draw the y ticks 
-g.selectAll(".yTicks")
-    .data(y.ticks(5))
-    .enter().append("svg:line")
-    .attr("class", "yTicks")
-    .attr("y1", function(d) { return -1 * y(d); })
-    .attr("x1", x(0)+5)
-    .attr("y2", function(d) { return -1 * y(d); })
-    .attr("x2", x(0));
+    var g = svg.append("svg:g")
+        .attr("transform", "translate(0," + h + ")");
 
-//draw the x grid   
-g.selectAll(".xGrids")
-    .data(x.ticks(5))
-    .enter().append("svg:line")
-    .attr("class", "xGrids")
-    .attr("x1", function(d) { return x(d); })
-    .attr("y1", -y(0))
-    .attr("x2", function(d) { return x(d); })
-    .attr("y2", -y(d3.max(data))-10);
+    var line = d3.svg.line()
+        .x(function(d,i) { return x(i); })
+        .y(function(d) { return -y(d); })
+
+    // draw the x axis
+    g.append("svg:line")
+        .attr("x1", x(0))
+        .attr("y1", -y(0))
+        .attr("x2", x(w))
+        .attr("y2", -y(0))
      
-// draw the y grid 
-g.selectAll(".yGrids")
-    .data(y.ticks(5))
-    .enter().append("svg:line")
-    .attr("class", "yGrids")
-    .attr("y1", function(d) { return -1 * y(d); })
-    .attr("x1", x(w))
-    .attr("y2", function(d) { return -y(d); })
-    .attr("x2", x(0));
+    // draw the y axis 
+    g.append("svg:line")
+        .attr("x1", x(0))
+        .attr("y1", -y(0))
+        .attr("x2", x(0))
+        .attr("y2", -y(d3.max(data))-10);
 
-// draw the x axis
-g.append("svg:line")
-    .attr("x1", x(0))
-    .attr("y1", -y(0))
-    .attr("x2", x(w))
-    .attr("y2", -y(0));
- 
-// draw the y axis 
-g.append("svg:line")
-    .attr("x1", x(0))
-    .attr("y1", -y(0))
-    .attr("x2", x(0))
-    .attr("y2", -y(d3.max(data))+10);
+    //draw the xLabels   
+    g.selectAll(".xLabel")
+        .data(x.ticks(5))
+        .enter().append("svg:text")
+        .attr("class", "xLabel")
+        .text(String)
+        .attr("x", function(d) { return x(d) })
+        .attr("y", 0)
+        .attr("text-anchor", "middle");
+     
+    // draw the yLabels 
+    g.selectAll(".yLabel")
+        .data(y.ticks(5))
+        .enter().append("svg:text")
+        .attr("class", "yLabel")
+        .text(String)
+        .attr("x", 25)
+        .attr("y", function(d) { return -y(d) })
+        .attr("text-anchor", "end");
 
-// draw the line of data points
-g.append("svg:path").attr("d", line(data));
+    //draw the x ticks    
+    g.selectAll(".xTicks")
+        .data(x.ticks(5))
+        .enter().append("svg:line")
+        .attr("class", "xTicks")
+        .attr("x1", function(d) { return x(d); })
+        .attr("y1", -y(0))
+        .attr("x2", function(d) { return x(d); })
+        .attr("y2", -y(0)-5);
+         
+    // draw the y ticks 
+    g.selectAll(".yTicks")
+        .data(y.ticks(5))
+        .enter().append("svg:line")
+        .attr("class", "yTicks")
+        .attr("y1", function(d) { return -1 * y(d); })
+        .attr("x1", x(0)+5)
+        .attr("y2", function(d) { return -1 * y(d); })
+        .attr("x2", x(0));
+
+    //draw the x grid   
+    g.selectAll(".xGrids")
+        .data(x.ticks(5))
+        .enter().append("svg:line")
+        .attr("class", "xGrids")
+        .attr("x1", function(d) { return x(d); })
+        .attr("y1", -y(0))
+        .attr("x2", function(d) { return x(d); })
+        .attr("y2", -y(d3.max(data))-10);
+         
+    // draw the y grid 
+    g.selectAll(".yGrids")
+        .data(y.ticks(5))
+        .enter().append("svg:line")
+        .attr("class", "yGrids")
+        .attr("y1", function(d) { return -1 * y(d); })
+        .attr("x1", x(w))
+        .attr("y2", function(d) { return -y(d); })
+        .attr("x2", x(0));
+
+    // draw the x axis
+    g.append("svg:line")
+        .attr("x1", x(0))
+        .attr("y1", -y(0))
+        .attr("x2", x(w))
+        .attr("y2", -y(0));
+     
+    // draw the y axis 
+    g.append("svg:line")
+        .attr("x1", x(0))
+        .attr("y1", -y(0))
+        .attr("x2", x(0))
+        .attr("y2", -y(d3.max(data))+10);
+
+    // draw the line of data points
+    g.append("svg:path").attr("d", line(data));
+}
+
+
 
 </script>
 </body>

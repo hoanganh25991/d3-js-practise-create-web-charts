@@ -251,6 +251,33 @@ class LineChart{
             c[method]();
         });
     }
+
+    fun(){
+        let svg = this.svg;
+        
+        let svg_origin = svg[0][0];
+        svg_origin.style.transition = 'all 1s ease-in-out';
+
+        let translate = function(){
+            console.log('current transform', svg_origin.style.transform);
+            svg_origin.style.transform = 'translate(400px,0px)';
+            svg_origin.dispatchEvent(new Event('translate_run'));
+        }
+
+        svg_origin.addEventListener('transitionend', translate);
+
+        svg_origin.addEventListener('translate_run', function(){
+            console.log('remove event listener, damn cool');
+            svg_origin.removeEventListener('transitionend', translate, false);
+        });
+
+        return svg_origin;
+    }
+
+    scale3(){
+        let svg_origin = this.fun();
+        svg_origin.style.transform = 'scale(3,3)';
+    }
 }
 
 function draw(){
